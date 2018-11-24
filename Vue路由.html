@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <script src="vue-router.js"></script>
+    <style>
+        .root-active{background: #654572;color: #42ffe5;}
+    </style>
+    <style>
+        .product-active{background: #42ffe5;color: #654572}
+    </style>
+</head>
+<template id="home">
+    <div class="home">
+        <h3>我是首页</h3>
+    </div>
+</template>
+<template id="product">
+    <div class="product">
+        <h3>我是商品页</h3>
+        <!-- 路由的传参：当激活子路由时，会发现子路由都被激活了，这是因为子路由的路由都是同一个路由product,所以要对子路由进行详细的配置，我们应该在调用子路由的时候试着传递不同的参数，
+        这样接收了不同参数的路由被选中才会被激活。/product/detail/001中product，detail被称为路由名，有时我们可以把这个路由配置成一个动态的路由，这样就相当于我们在请求不
+        同的参数。但是匹配的时候我们要首先匹配到detail这个子路由，再向子路由传递不同的参数。这个参数配置sid时是一个动态的参数，在调用的时候要给它一个具体的真实的参数001、
+        002、003，这时因为他们使用同一个组件detail，所以同一个组件里面的内容没有发生变化，想要发生变化就需要通过resource或者axios求取相应的数据-->
+        <router-link active-class='product-active' to="/product/detail/001">详情列表1</router-link>
+        <router-link active-class='product-active' to="/product/detail/002?a=1&b=2">详情列表2</router-link><!-- ?a=1&b=2是路由后面传递数据的一种方式 -->
+    <router-link active-class='product-active' :to="{name:'detail',params:{sid:'003'},query:{a:1,b:2}}">详情列表3</router-link>
+        <!-- :to="{name:'detail'}"是路由后面传递数据的另一种方式，配合配置路由是给子路由添加一个name配置，来达到数据传递，这种方式也叫命名路由，这种方式存在的场景是前面的
+            路径非常长的情况，可以在子组件detail中添加一个name属性，即在router-link后使用:to="{name:'detail'}"的写法 -->
+        <!-- 子路由也需要router-view 展示区 -->
+        <router-view></router-view>
+    </div>
+</template>
+<template id="user">
+    <div class="user">
+        <h3>我是vip</h3>
+    </div>
+</template>
+<template id="login">
+    <div class="login">
+        <h3>我是登录页</h3>
+    </div>
+</template>
+<template id="reg">
+    <div class="reg">
+        <h3>我是注册页</h3>
+    </div>
+</template>
+<template id="detail">
+    <div class="detail">
+        <h3>我是详情页</h3>
+        <div>参数：{{$route.params.sid}}</div>
+        <div>路径：{{$route.path}}</div>
+        <div>数据：{{$route.query}}</div>
+    </div>
+</template>
+<template id="error">
+    <div class="error">
+        <h3>我是404</h3>
+    </div>
+</template>
+<body>
+    <!-- 前端的路由主要用来做导向，这个导向是做单页面的，不会让页面整体重载，它会让
+    页面的其中一部分组件卸载，再引入一些激进的组件进来，不会引起页面重载。
+            功能包括：（面试时说的内容）
+
+            嵌套路由/视图映射
+            模块化，基于组件的路由器配置
+            路线参数，查询，通配符
+            查看由Vue.js过渡系统提供支持的过渡效果
+            细粒度的导航控制
+            带有自动激活的CSS class 的链接
+            HTML5历史模式或哈希模式，在IE9中具有自动回退功能(我们可以在Vue路由里面配置是history或者hash模式)
+            可自定义的滚动行为 -->
+<!--SPA: 	single page application   Vue的路由主要做单页面应用
+         特点： 速度快，数据通过ajax请求，然后再通过路由来导航告诉去哪，页面不会整体重载
+        实现:  路由 -> 加载(ajax)对应的内容  告诉你去哪?  根据url的不同，加载组件
+            
+        路由要求： 引入 vue-router.js
+
+         路由使用流程：第一步：页面上有一些链接，这些链接会去跳转，我们要把这些链接变成vue-router插件给我们提供的组件来使用，比如
+         锚点链接或者按钮在跳转，我们需要把这些标签转化成router-link组件来实现跳转，跳转完之后，页面不会重载，我们要把组件
+         扔到当前页面来显示那就需要一个展示区router-view，在使用路由的时候需要有一个目的地，也就是router-link to='/home'，
+         要想让链接指向正确的地方，就必须先对路由进行配置，这个配置说穿了就是一个数组，在这个数组中有一大堆的对象，即 
+         [{path:'/home',component:home},,{}]，每个对象都是一条路由的相关配置比如说刚刚有个路由要到home主页（path:'/home'），
+         那么就需要找home组件（ component:home），找到之后就会把home组件加载进来显示到router-view展示区里，这样就没有加载新页面的概念了，
+         这个配置的数组和router这个插件没有任何关系，所以要有一个对象把router插件和配置的数组整合到一块，这个对象是在引入了vue-router插件
+         之后可以创建的一个路由对象，我们通过实例化一个路由对象，把刚刚的配置放到这个路由对象里来，这样就有一个路由对象把导向（router-link
+         to='/home'）和配置整合到了一块，这样这个路由对象就可以控制整个的路由跳转，他就知道有一个path:'/home'的请求发送到了它这里，然后它
+         就会找它里面的配置，如果配置里面有那就返回对应的数据，但是这个路由对象不知道要把这个对应的数据返回给哪个具体的应用，所以这时我们要
+         把这个路由对象注册到根实例上，简单的说就是我们把vue-router插件引进来时，打造一个路由对象，传递一个配置数组，然后这个路由对象要注册
+         到根实例上，这个路由对象才可以依附这个根实例，为这个根实例做一些路由跳转，那么在当前的根实例下面，所有使用router-link组件进行跳转的
+         时候发出具体的跳转请求（to="/home"）后就会被路由对象收到，收到之后就会在配置数组里面找相关的配置，有就可以跳转了
+            0.	import VueRoter from 'vue-router' -> Vue.use(VueRouter) 安装
+            1. 使用路由 (去哪)
+                <router-link to="/home">首页</router-link>
+                router-link默认情况下被解析成一个a标签，to就是说当用户点首页时候，可以跳转到哪里去，跳转的时候会把"/home"解析成"#/home"，
+                这种形式就是hash模式，也就是通俗说的锚，同时，它会默认给router-link添加一些样式class=router-link-exact-active router-active.tag
+                就是说可以把这个router-link组件解析成什么 active-class用来指定当前路由被激活后的样式,router-active是router-link组件的一个内置属性.
+                <router-view>展示区</router-view>
+                router-view组件是展示区，它把路由对象发送的请求解析成对应的页面数据组件比如
+         说发送的请求是要寻找product页面，那么这个展示区就把这个请求解析成product组件加载
+         到页面中。router-view本身不会被渲染，它只会把路由对象请求的那个组件渲染到页面中去
+                router-link 组件属性  
+                    tag='li' 指定编译后的标签
+                    active-class='类名' 指定激活后的样式
+            2. 配置路由(建立组件和请求的对应关系)	数组
+                [{path:'/home',component:home},,{}]
+                path 路径
+                component: 指向的组件变量名
+            3. 创建路由(传递配置)
+                router = new VueRouter(配置)
+                配置:	{routes:数组}
+            4. 顶层|根组件，注册路由 （路由控制页面组件的加载）
+                选项
+                    router(选项):router (router对象)
+            子路由：children
+                routes=[
+                    {},
+                    {
+                        path:xx
+                        component:xx
+                        children:[  子路由
+                            {}
+                            ..
+                        ]
+                    },
+                    {}
+                ]
+参数配置:
+    {path:'xx/:参数变量',component:xx}
+
+传递参数 and 数据
+路由的传参：当激活子路由时，会发现子路由都被激活了，这是因为子路由的路由都是同一个路由product,所以要对子路由进行详细的配置，我们应该在调用子路由的时候试着传递不同的参数，
+这样接收了不同参数的路由被选中才会被激活。/product/detail/001中product，detail被称为路由名，有时我们可以把这个路由配置成一个动态的路由，这样就相当于我们在请求不同的参数。
+但是匹配的时候我们要首先匹配到detail这个子路由，再向子路由传递不同的参数。这个参数配置sid时是一个动态的参数，在调用的时候要给它一个具体的真实的参数001、002、003，这时因为
+他们使用同一个组件detail，所以同一个组件里面的内容没有发生变化，想要发生变化就需要通过resource或者axios求取相应的数据
+router-link to='xx/参数?a=1b=2'
+router-link :to='{name:'xx',params:{},query:{}}'  叫做命名路由
+
+接收参数和数据
+    {{this.$route.params|query|path}}
+
+组件内部实现路由跳转: 编程式导航:
+编程式导航可以实现在业务逻辑中实现跳转：首先页面要先挂载，然后我们在任何一个组件里面都可以拿到一个全局属性$router，也就是根实例上面的$router,页面如果有router-link进行跳转
+时，实际上是在当初new出来的Vuerouter这个路由对象中查找是否有相关的配置router，如果有根实例上$router才会跳转，而这个全局属性$router的配置就是router的配置routes。我们可以
+通过$router上面的原型方法this.$router.go(-1|1) 来实现回退/前进；通过this.$router.push({path:'...'})来实现添加一个路由（会记录到历史记录)并跳转:当它跳转的时候上一个组件
+被卸载，加载跳转后的组件，当点击历史记录时，上一个组件会重新加载；通过this.$router.replace({path:'...'})来实现替换一个路由（不会记录到历史记录)
+    router.push(...)
+    this.$router.push({path:'...'})   添加一个路由 （记录到历史记录)
+    this.$router.replace({path:'...'})   替换一个路由 （不记录到历史记录)
+    this.$router.go(-1|1)|goBack()  回退/前进  history.go|goBack -->
+    <div id="app">
+        <!--router-link默认情况下被解析成一个a标签，to就是说当用户点首页时候，可以跳转到哪里去，跳转的时候会把"/home"解析成"#/home"，这种形式就是hash模式，也就是通俗说的锚，同时，
+            它会默认给router-link添加一些样式class=router-link-exact-active router-active.tag就是说可以把这个router-link组件解析成什么 active-class用来指定当前路由被激活后的
+            样式,router-active是router-link组件的一个内置属性.-->
+            <!-- active-class='root-active'中的root是指根级的路由 -->
+        <router-link active-class='root-active' to="/home">首页</router-link>
+        <router-link active-class='root-active' to="/product">商品页</router-link>
+        <router-link active-class='root-active' to="/user">用户页</router-link>
+        <router-link active-class='root-active' to="/login">登录</router-link>
+        <router-link active-class='root-active' to="/reg">注册</router-link>
+        <!-- router-view组件是展示区，它把路由对象发送的请求解析成对应的页面数据组件比如
+         说发送的请求是要寻找product页面，那么这个展示区就把这个请求解析成product组件加载
+         到页面中。router-view本身不会被渲染，它只会把路由对象请求的那个组件渲染到页面中去 -->
+        <router-view></router-view>
+    </div>
+    <script>
+        let home={
+            
+            template:'#home',
+            // 编程式导航可以实现在业务逻辑中实现跳转：首先页面要先挂载，然后我们在任何一个组件里面都可以拿到一个全局属性$router，也就是根实例上面的$router,页面如果有router-link进行跳转时，实际上是在当初new出来的Vuerouter
+            // 这个路由对象中查找是否有相关的配置router，如果有根实例上$router才会跳转，而这个全局属性$router的配置就是router的配置routes。我们可以通过$router上面的原型方法this.$router.go(-1|1)
+            // 来实现回退/前进；通过this.$router.push({path:'...'})来实现添加一个路由（会记录到历史记录)并跳转:当它跳转的时候上一个组件被卸载，加载跳转后的组件，当点击历史记录时，上一个组件会重新
+            // 加载；通过this.$router.replace({path:'...'})来实现替换一个路由（不会记录到历史记录)
+            mounted () {
+                console.log(this.$router)
+                setTimeout(()=>{
+                    // this.$router.replace('/login')
+                    this.$router.push({
+                        name:'detail',
+                        params:{sid:'004'},
+                        query:{a:123,b:987}
+                    })
+                },1000)
+            }
+        }
+        let product={template:'#product'}
+        let user={template:'#user'}
+        let login={template:'#login'}
+        let reg={template:'#reg'}
+        let detail={
+            template:'#detail',
+            mounted() {//mounted代表的是页面挂载，当他们使用的是同一个组件detail时，detail组件会被复用当他挂载一次之后因为是相同的组件不会重新挂载，只有当他更新updated时页面才会重新挂载
+                this.$route.query,this.$route.params
+                // console.log(this.$route.query,this.$route.params);
+            },
+            updated(data) {
+                this.$route.query,this.$route.params
+                // console.log(this.$route.query,this.$route.params);
+            }
+        }
+        
+        //创建一个路由对象，并且进行配置（数组）
+        let routes=[//配置路由对象.路由的匹配规则是自上而下匹配，只要有一个匹配到了，那么就不会向下匹配是一种惰性匹配也可以叫做排他性匹配，找到一个就不会匹配其他
+            {path:'/',redirect:'/home'},//redirect是跳转的意思，也就是说当路由对象请求的是一个'/'时，它会跳转到'/home',它只做路由的跳转,并不做路由的匹配这也叫做路由的重定向
+            {path:'/home',component:home},//一个对象就是一个路由配置
+            {   
+                
+                path:'/product',//也可以用path:'/product/detail'这样匹配子路由，下面children里面就不需要再匹配detail
+                component:product,
+                children:[//路由的嵌套
+                    {  name:'detail',//命名路由，配合router-link ：to="{name:'detail'}"实现数据传递
+                       path:'detail/:sid',//动态路由的写法：子路由/:不同的参数
+                       component:detail
+                    }
+                    ]//detail前面不需要再加/，因为加/代表寻找的是根实例下的路由，而detail是produ的子路由，所以不需要加
+            },
+            {path:'/user',component:user},
+            {path:'/login',component:login},
+            {path:'/reg',component:reg},
+            {path:'*',component:error}
+        ] 
+         //创建一个路由对象，也可以给这个对象传一些配置参数
+        const router = new VueRouter({
+            routes: routes,
+            // mode:'history' 
+            //mode默认是hash模式（会在路由后面添加一个#）我们可以直接刷新页面，开发模式下使用；
+            // 也可以设置成其他模式：history模式，这时不能直接刷新页面，需要配合后端才能知道这个页面从哪里来，所以真实上线环境下使用此模式
+        })
+        console.log(router);
+        // 根实例
+        let vm= new Vue({
+            el:'#app',
+            router:router
+            //把路由对象router对象注册到根实例上,所以要打造一个router选项，由这个路由对象router响应各种各样的请求。注册到根实例上不是为了控制整个根实例，而是为了传递路由数据
+        })
+    </script>
+</body>
+</html>

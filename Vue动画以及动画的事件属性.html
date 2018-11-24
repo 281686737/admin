@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <script src="velocity.min.js"></script>
+    <link rel="stylesheet" href="./css/animate.css">
+    <style>
+        .box{
+            width:100px;
+            height: 100px;
+            background: red;
+            position: absolute;
+            left: 300px;
+            top:160px;
+            transition: 1s ease all
+            }
+        .box1{
+            width:100px;
+            height: 100px;
+            background: red;
+            position: absolute;
+            left: 300px;
+            top:100px;
+            /* transition: 1s ease all */
+            }
+            .box2{
+            width:100px;
+            height: 100px;
+            background: red;
+            position: absolute;
+            left: 300px;
+            top:220px;
+            /* transition: 1s ease all */
+            }
+            .box3{
+            width:100px;
+            height: 100px;
+            background: red;
+            position: absolute;
+            left: 300px;
+            top:320px;
+            /* transition: 1s ease all */
+            }
+        /* css里面的过渡动画transition,要关注入场前和离场后的动画状态,同时要配合css样式中的transition属性,点击速度快没有跳变 */
+        .fade-enter{
+            opacity: 0;
+            left:0;
+        }
+        .fade-leave-active{
+            opacity: 0;
+            left:0px
+        }
+        /* animation动画是由keyframs完成的，不需要css样式中的transition属性，关注的是入场后enter-active和离场后leave-active的动画状态，点击速度快会有跳变 */
+
+        /* .fadeIn{
+            animation:1s  ease fadeIn;
+        }
+        .fadeOut{
+            animation: fadeOut ease 1s;
+        }
+        @keyframes fadeIn{
+            0%{opacity: 0;left:0;}
+            100%{opacity: 1;left:300px;}
+        }
+        @keyframes fadeOut{
+            0%{opacity: 1;left:300px;}
+            100%{opacity: 0;left:0px;}
+        } */
+
+        /* animate动画库实现动画 需要先引入animate.css动画库,注意写项目适合可以这样写，但是项目上线就会发现库里面很多都是没有用到的，解决方法就是把具体的动画方案以及keyframes拿出来，同时也要把animated这个总属性也要拿出来 */
+    </style>
+</head>
+<body>
+        <!-- 
+        vue动画:指的是里面的转场动画，它会有一个入场动画，还会有一个离场动画
+
+        动画组件: transition|transition-group	Vue里面谁做动画，就用transition这个组件包裹着谁：这个组件上面会有一些
+        属性需要我们学习，另外组件身上还有一些事件需要进行绑定。属性可以指名，告诉我们需要定义具体的哪个类，而事件告诉我们
+        某个动画正在做，在做的过程中以及做完了这三个过程中分别都会在入场前，入场中，入场后这三个状况下都会触发对应的钩子函数，
+        因为这分别代表的是某种状态在发生，所以说某个动画在入场前，入场中，入场后，离场前，中，后都会有某些具体的事件发生，
+        Vue提供了一个transition组件，这个组件又提供了一些属性告诉我们可以做哪一类动画，做哪一个动画，以及动画在做的过程中
+        又会触发哪些事件，可以认为是一个钩子函数，因为它标志着动画在做前，做中，做后的一些时间节点，我们可以根据这些时间节点
+        做一些业务逻辑进行处理，这就是Vue动画.动画本身是通过css实现的，Vue模版里面的元素要被自带的transition组件进行包裹，然
+        后只需要指定这个组件就好了，实现这个组件身上的属性和事件就可以让模版里面的被包裹的元素做动画。
+        过渡动画如果做transition动画，中间的动画会自己过渡，所以transition动画注重的是动画的入场前enter和离场后leave-active
+        的效果；如果做animation动画，它里面有一个keyframs属性定义从百分之0到百分之百之间要做什么动画，所以animation动画要关注
+        动画的入场后enter-active以及离场后leave-active的效果。
+        组件属性:
+            name =  "动画名"--自定义的名字，但是要对应相应的动画名
+            enter-class = "类名"
+            enter-active-class = "类名"
+            leave-class = "类名"
+            leave-active-class = "类名"
+        样式：
+            .动画名-enter{..}  入场前(打哪来)
+            .动画名-enter-active{..} 入场后(来了停哪)
+            .动画名-leave{..} 离场前
+            .动画名-leave-active{..} 离开场后(到哪去)
+    
+        transition组件事件:
+            @before-enter="方法(el)"   el==做动画的元素(原生)
+            @enter="方法"
+            @after-enter="方法"
+            @before-leave="方法"
+            @leave="方法"
+            @after-leave="方法"
+    
+        1) css3
+            transition：无跳变
+                .动画名-enter{..} 打哪来   +   .动画名-leave-active{..} 到哪去
+            animation：有跳变，里面有一个keyframs,规定百分之0或者from的点，所以没法关注入场前以及离场前的状态，但是
+            推荐使用animation做动画，因为性能提高很多
+            .动画名-enter-active{指定入场} 来了停哪 + .动画名-leave-active{指定离场}到哪去
+        2) css库 animate.css
+            同 animation 有跳变
+        3) js库 动画名  需要设定初始位置，秉承了transition动画的特性，没有跳变.如果不需要观察动画进度的话，不需要使用velocity
+            下载 velocity.js   http://velocityjs.org/
+            使用:	Velocity(el,{css属性},{配置})
+    
+            配置:
+                duration: 毫秒   事件
+                easing: 动画类别 ''
+                Queue
+                complete:fn()
+                progress:fn
+                loop: 1 次  true无限
+                delay: 毫秒 延时
+                display:'none/block' 动画结束时是否可见
+            注意：
+                leave(el,done){}
+        
+    transition-group:
+        一组动画
+        transition-group 包着一组元素  ，每个元素要有key ,就是说transition-group想知道它里面的元素哪些要做动画，哪些
+        不要做：如果不想让某个元素做动画可以不给它加key，那么就可与实现这个元素不做动画的效果，但是vue会报告一个警告，一
+        般情况下这个key是数据携带的key,不需要我们手动添加比如百度搜索时会出现一个下拉菜单，key是数据携带的 其他的同transition 
+    -->
+
+    <div id="app">
+         <h3>动画</h3>
+         <input type="button" value="按钮" @click='conBox'>
+         <!-- <transition name="fade">transition动画 -->
+         <!-- <transition
+         enter-active-class = "animated fadeInLeft"
+         leave-active-class = "animated fadeOutRight"
+         
+         @before-enter="beforeEnter"  
+         @enter="enter"
+         @after-enter="afterEnter"
+         @before-leave="beforeLeave"
+         @leave="leave"
+         @after-leave="afterLeave"
+         >
+         <div class="box" v-show='bl'>box</div>   
+         </transition> -->
+         <!-- <transition-group 
+         enter-active-class = "animated fadeInLeft"
+         leave-active-class = "animated fadeOutRight"
+         >
+             <div class="box1" v-show='bl' key="1">box1</div>
+             <div class="box2" v-show='bl' >box2</div>
+             <div class="box3" v-show='bl' key="3">box3</div>
+         </transition-group> -->
+         <!-- transition也可以适用于组件以及动态组件
+           -->
+         <input type="button" value="按钮2" @click="com='aa'">
+         <input type="button" value="按钮3" @click="com='bb'">
+
+             <transition name="fade" mode="">
+                 <!-- 1.组件：点击按钮时加载aa组件    -->
+                 <!-- <aa v-show='bl'></aa> -->
+                 <!-- 2.动态组件 :点击按钮2时加载aa组件；点击按钮3时加载bb组件-->
+                <component :is="com"></component>
+             </transition>
+                   
+    </div>
+    <template id="aa">
+            <div class="box">
+                <slot name="ban"></slot>
+                <ul>
+                    <li>xxxx</li>
+                    <li><slot></slot></li>
+                    <li>xxxx</li>
+                    <li>xxxx</li>
+                </ul>
+                <slot name="ft"></slot>
+
+            </div>
+         </template>
+         <template id="bb">
+            <div class="box">
+                <h3>bb组件</h3>
+            </div>
+         </template>
+    <script>
+        let aa={
+                 template:'#aa',
+                 data(){
+                     return {
+                         msg:'aa数据'
+                     }
+                 }
+             }
+             let bb={
+                 template:'#bb',
+                 data(){
+                     return {
+                         msg:'bb数据'
+                     }
+                 }
+             }
+        let vm= new Vue({
+            el:'#app',
+            data:{
+                bl:false,
+                com:'aa'
+            },
+            methods: {
+                conBox(){
+                    this.bl=!this.bl
+                },
+                beforeEnter(){console.log('beforeEnter');},
+                enter(){console.log('enter');},//如果想做闪烁动画的话需要在入场中来做，要配合计时器让动画一直运行以及js中onAnimationStart事件触发动画，动画结束之后利用onAnimationEnd事件结束动画
+                afterEnter(el){console.log('afterEnter');el.style.background='green'},
+                beforeLeave(){console.log('beforeLeave');},
+                leave(el){console.log('leave');el.style.background='red'},
+                afterLeave(){console.log('afterLeave')},
+            },
+            components:{
+                aa,bb
+            }
+        })
+       
+    </script>
+</body>
+</html>

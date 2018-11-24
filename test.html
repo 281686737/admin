@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+<style>
+    .a{background: green}
+    .b{width: 100px;color:#998}
+    .odd{background: #164382}
+    .event{background: #764382}
+
+</style>
+</head>
+<body>
+    <div id="app">
+        <input type="button" value="修改" v-on:click="check" v-model.lazy='msg'>
+        <input type="button" value="修改" @click="check2($event,12)">
+      
+
+        模版数据：{{msg}}
+          <!-- v-text,v-html,v-bind(可以简写成':'),v-on(可以简写成'@'),v-for,v-show,v-model被称为指令，也可以自定义指令，
+            它扩展了HTML语法，区别了普通的HTML属性，其实就是自定义的dom属性:v-text转义的是文本数据；v-html转义的是HTML标签；
+            v-bind用来动态的绑定一个或者多个特性。没有参数时，可以绑定到一个包含键值对的对象。常用于动态绑定class和style以及
+            href等。;v-on用于事件绑定；v-for用于枚举，也可以枚举对象；v-show主要用于修改css样式的是否display,页面加载会有一
+            个初始渲染消耗，v-show适合频繁切换，所以推荐使用，而v-if主要操作的dom，频繁切换会有消耗，所以不推荐使用；v-model
+            用于双向数据绑定 -->
+       <div v-text='msg' v-color="'#998765'" :style="'width:100px;text-align:center'"></div> <br>
+       <div v-html='strong'></div> <br>
+        <!-- {{arr}}<br> -->
+        <div v-for="(val,index) of obj">{{val}}/{{index}}</div><br>
+        <div class="a b">box1</div>
+        <div :class="classa">box2</div>
+        <div :class="'a b'">box3</div>
+        <div :class="[{a:true},{b:false}]" >box4</div>
+        <div :class="[{a:true},{b:true}]">box5</div>
+        <div :class="['a','b']">box6</div>
+        <hr>
+
+        <div  style="width:100px;background:#724522">box1</div>
+        <div :style="'width:100px;background:#724522'">box2</div>
+        <div :style="[{width:'100px'},{background:'#724522'}]">box3</div>
+        <div :style="{width:'100px',background:'#724522'}">box4</div>
+        <hr>
+        <ul>
+            <!-- <li v-for="n in 10" :class="{odd:n%2==0,event:n%2==1}">{{n}}</li>等价于 -->
+            <li v-for="n in 10" :class="n%2==0?'odd':'event'">{{n}}</li>
+
+        </ul>
+
+        {{fn}}<br>
+        <div id="box">
+             <div v-show='bl'>div1</div>
+             <!-- 手动操作实现双向绑定 -->
+             <input type="text" :value='ipt' @input='changeIpt'>
+             {{ipt}}
+             <hr>
+             <!-- v-model实现双向绑定 -->
+             <select v-model="selected">
+                 <option v-for="(item, index) in list" 
+                         :key="item.id" 
+                         :value="item.value">
+                        {{item.text}}</option>
+             </select>
+             <span>选中:{{selected}}/{{cptText}}</span>
+        </div><br>
+        <hr>
+        
+        <!-- 自定义指令: 指令是个函数|对象,用来操作dom的, 里面的this 返回window
+                    a)	Vue.directive('指令名不带v-',函数(el,binding))，每次只能定义一个。它是定义在全局，也就是定义
+                    在类的头上，未来所有的实例都可以使用，它的作用域是全局
+                        el == 使用指令的DOM元素
+                        binding 是个对象 含有传入的 参数(binding.value)
+                    b)  定义在当前实例的选项里面，是私有的，只在当前new出来的实例里面使用，作用域是当前
+                        directives:{
+                            指令名不带v-	: 函数(el,binding){}
+                        }
+
+                    指令是个函数(简写)，可以是个对象
+
+                    {
+                        钩子函数(生命周期):
+                        inserted:fn(el,binding)		绑定指令的元素插入到父节点时调用
+                        bind:fn	指令第一次绑定到元素时调用
+                        update:fn	指令所在的元素的model层的数据，view有更新请求时
+                        componentUpdated:fn	更新完成时
+                    }
+
+                    简写方式:代表的是 bind + update两种状态被激活 -->
+        <div v-color="'yellow'">box</div>
+        <div v-color="'red'">box2</div> 
+        <div>
+              <input type="text" v-bulala v-model="ipt2">{{ipt2}}
+        </div> 
+      
+        <input type="text" v-focus>
+        <input type="button" value="搜素">
+        <hr>
+    
+        <!-- <ul>
+            <li v-for="val in arr">{{val}}</li>
+        </ul>
+        <ul><img :src="" alt="">
+                <li v-for="val of arr">{{val}}</li>
+        </ul> -->
+        <ul>
+                <li v-for="(item,index) in arr" :key="item.id"><a href="">{{item.src}}/{{item.price}}/{{item.name}}/{{index}}</a>
+                    <input type="button" value="修改" v-on:click="check3">
+
+                    <ul>
+                        <li v-for="(item2,index) of item.data" :key="item2.id">{{item2.src}}/{{item2.price}}/{{item2.name}}/{{index}}
+                        <input type="button" value="修改" v-on:click="check3">
+                    </li>
+                    </ul>
+                </li>
+        </ul>
+        <hr>
+        <img v-bind:src="src" :style="'width:300px;height:100px'">
+        <!-- v-bind 可以简写成下面的格式-->
+        <img :src="src" :style="'width:300px;height:100px'">
+
+
+    </div>
+    <script>
+            // Vue.directive('color',function(el,binding){//binding是值
+            //     //指令就是用来操作DOM的
+            //     el.style.background=binding.value
+            // })
+            Vue.directive('bulala',{
+                 bind:function(el,binding){
+                     console.log('指令第一次绑定到元素时调用')
+                 },
+                 inserted:function(el,binding){
+                     console.log('绑定指令的元素插入到父节点时调用')
+                 },
+                 updated(){
+                     console.log('指令所在的元素的model层的数据，view有更新请求时')
+                 },
+                 componentUpdated(){
+                     console.log('更新完成时')
+                 } 
+                })
+            // 自动获焦功能,另外简写时候是代表具体的某个钩子函数运行了
+            Vue.directive('focus',
+                {inserted:function(el){//binding是值
+                //指令就是用来操作DOM的
+                el.focus()}
+            })
+            let vm = new Vue({//vm实例
+                //选项
+                //key:value
+                el:'#app',//el:'选择器'
+                directives: {
+                    color(el,binding){
+                         el.style.background=binding.value
+                    }
+                   
+                },
+                data:{      // data相当于model层，用于存放数据，读取数据，初始化数据，链接的是数据库，vue需要借助其他的工具才能实现链接数据库
+                    msg:'数据',//vm实例属性，可以放任何东西
+                    num:213,
+                    classa:'a b',
+                    ipt:'hello',
+                    ipt2:'',
+                    list:[
+                        {id:1,value:'SH',text:'上海'},
+                        {id:2,value:'BJ',text:'北京'},
+                        {id:3,value:'SZ',text:'深圳'},
+                        {id:4,value:'GZ',text:'广州'}
+                    ],
+                    selected:'BJ',
+                    arr:[{
+                            "id":1,
+                            "src":"https://img12.360buyimg.com/n7/jfs/t17149/173/1779654602/189601/335d3d90/5ad8628dN03dc292f.jpg",
+                            "price":"699",
+                            "name":"荣耀10 全面屏AI摄影手机 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待"
+                        },{
+                            "id":2,
+                            "src":"https://img12.360buyimg.com/n7/jfs/t17149/173/1779654602/189601/335d3d90/5ad8628dN03dc292f.jpg",
+                            "price":"699",
+                            "name":"荣耀10 全面屏AI摄影手机 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待",
+                            "data":[
+                            {
+                            "id":1,
+                            "src":"https://img12.360buyimg.com/n7/jfs/t17149/173/1779654602/189601/335d3d90/5ad8628dN03dc292f.jpg",
+                            "price":"699",
+                            "name":"荣耀10 全面屏AI摄影手机 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待"
+                            },
+                            {
+                            "id":2,    
+                            "src":"https://img12.360buyimg.com/n7/jfs/t17149/173/1779654602/189601/335d3d90/5ad8628dN03dc292f.jpg",
+                            "price":"699",
+                            "name":"荣耀10 全面屏AI摄影手机 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待"
+                            },
+                            {
+                            "id":3,
+                            "src":"https://img12.360buyimg.com/n7/jfs/t17149/173/1779654602/189601/335d3d90/5ad8628dN03dc292f.jpg",
+                            "price":"699",
+                            "name":"荣耀10 全面屏AI摄影手机 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待"
+                            }
+                            ]
+                        },{
+                            "id":3,
+                            "src":"https://img12.360buyimg.com/n7/jfs/t17149/173/1779654602/189601/335d3d90/5ad8628dN03dc292f.jpg",
+                            "price":"699",
+                            "name":"荣耀10 全面屏AI摄影手机 6GB+64GB 幻夜黑 全网通 移动联通电信4G 双卡双待"
+                        }],
+                    obj:{a:1,b:2},
+                    fn:function(){alert('ok')},
+                    bl:true,
+                    strong:'<strong>你好</strong>',
+                    src:'http://c.hiphotos.baidu.com/image/pic/item/d439b6003af33a87436092e0ca5c10385343b53f.jpg'
+                },
+                methods: {
+                    check:function(ev){
+                        vm.msg="你好吗";
+                        console.log('check',ev.target);
+                    },
+                    check2:function(ev,arg){
+                        vm.msg="你好吗";
+                        console.log('check',ev,arg);
+                    },
+                    check3:function(ev,arg){
+                       ev.srcElement.parentNode.style.background='red';
+                    },
+                    changeIpt(ev){//手动操作双向绑定
+                        this.ipt=ev.srcElement.value
+                    }
+                },
+                computed:{
+                    cptText(){
+                        let result='';
+                        this.list.map((item,index)=>{
+                            if(item.value==this.selected){
+                                result= item.text;
+                            }
+                        })
+                        return result
+                    }
+                }
+            })
+    </script>
+</body>
+</html>

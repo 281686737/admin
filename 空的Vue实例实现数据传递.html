@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h3>父组件</h3>
+        <!-- 先由cc订阅，才能接收到aa,bb发布的数据，所以说每个组件在调用的时候，实际上是函数在调用，当调用的时候，订阅发布就产生了，
+            如果说aa或者bb里面各自有个按钮，在点击按钮的时候再发送，cc里面只需要订阅就好了，那么cc组件是可以收到发送的数据，因为当能
+        够点击按钮的时候，aa,bb,cc的钩子函数的生命周期已经跑完了，组件已经加载完毕 -->
+           <cc></cc>
+            <aa></aa>
+            <bb></bb>
+           <!-- <cc></cc> -->
+             
+    </div>
+        <template id="aa">
+            <div class="aa">
+                <h3>aa</h3>
+            </div>
+        </template>
+        <template id="bb">
+            <div class="bb">
+                <h3>bb</h3>
+            </div>
+        </template>
+        <template id="cc">
+            <div class="cc">
+                <h3>cc</h3>
+            </div>
+        </template>
+<script>
+    let bus=new Vue()
+    let aa={
+        template:'#aa',
+        data(){
+            return {
+                msg:'aa数据'
+            }
+        },
+        mounted() {
+            bus.$emit('aa-to-cc',this.msg)
+        },
+    }
+    let bb={
+        template:'#bb',
+        data(){
+            return {
+                msg:'bb数据'
+            }
+        },
+        mounted() {
+            bus.$emit('bb-to-cc',this.msg)
+        }
+    }
+    let cc={
+        template:'#cc',
+        data(){
+            return {
+                msg:'cc数据'
+            }
+        },
+        mounted() {
+            bus.$on('aa-to-cc',(data)=>{
+                console.log(data);//要把数据传过去需要借助cook和localstorage
+            })
+            bus.$on('bb-to-cc',(data)=>{
+                console.log(data);
+            })
+        }
+    }
+    let vm = new Vue({
+        el:'#app',
+        components: {
+            aa,bb,cc
+        }
+    })
+</script>
+</body>
+</html>

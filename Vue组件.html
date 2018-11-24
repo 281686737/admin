@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <!-- 
+        组件：
+            Vue根实例表示1个应用，一个应用有若干个组件拼装而成
+        使用组件
+            <组件名></组件名>
+        定义组件  注意：组件必须要有一个根级元素包裹才能使用
+            定义:
+                a) 	  let 组件变量名= Vue.extend({
+                        template:'<div class="header">我是header组件</div>'
+                            }); 
+                <script id="hd" type="x-template">
+                <div>
+                        <h3>hello</h3>
+                        <div>world</div>
+                    </div>                
+                </script>
+                b)	 let 组件变量名={};		√ Vue认为一个组件就是一个对象，根实例被称为根组件
+                定义一个组件，所有的组件都可以自定义名字，每个组件的首字母度大写，放在组件内部的东西叫做选项，根实例也叫根组件，
+            能出现在根组件里面的选项基本上都可以放在子组件里面，子组件里面的选项也可以放在根组件里面
+                let Header={//这就是组件变量，Header就是组件变量名，template组件代表当前组件所使用的模版
+            
+                //     name:'bulala',
+                //     template:'<div>我是头部组件</div>'     
+                // }
+
+            注册(拼装)
+            注册组件只有一种方式，组件的注册，可以注册全局的也可以注册局部的，全局的可以拆分出去其他实例都可以使用，局部的只有当前实例可以使用
+                a)	Vue.component('组件名',组件变量名);
+                b)	选项
+                    components:{
+                        组件名：组件变量名	√
+                    }
+        组件数据
+            data 要是个函数，且要有返回值 object
+            组件里面的数据必须是一个函数，这个函数返回一个对象，而数据就是在这个返回的对象里面,真正渲染页面的是根实例，因为根实例才找到了页面数据的注入点，
+            而组件的职责就是把自己的模版和数据整合到一起，然后返回给根实例，由根实例来调用这些组件渲染页面。也就是说当我们调用某一个组件的时候，这个组件的
+            data函数就会被调用，然后会返回来数据，这些数据才能在当前的组件里面找到对应的数据名进行文本解析，解析完之后会拿着解析后的数据返回给我们的根组件，
+            再由根组件来渲染页面，其他的下层组件只有把数据交给根组件就可以了
+
+        模板：
+            组件内部: template: #id名
+            <script type="x-template" id='id名'
+            <tempate id='id名'...
+
+        组件（单文件)
+            script + template + style  一个单文件的组件有三部分组成，style样式、template组件、以及script脚本
+          
+        -->
+            <div id="app">
+                <hd></hd>
+                <wrap></wrap>
+                <ft></ft>
+                <v-header></v-header><!-- 组件的使用 -->
+                
+             </div>
+
+             <!-- 一个单文件的组件有三部分组成，style样式、template组件、以及script脚本 -->
+             <style>
+                 .nav{background: #675295}
+             </style>
+
+             <!-- 模版存放方法一 每个组件都有它自己独立的作用域-->
+            <template id="hd">
+                    <nav class="nav">
+                            <li href="" v-for='val of list'>{{val}}{{msg2}}</li>
+                    </nav>
+            </template>
+            <template id="wrap">
+                <div>
+                         <div class="wrap">xxxx</div>
+                <input type="button" value="按钮" @click="show">
+                </div>
+           
+            </template>
+            <template id="ft">
+                     <div class="footer">fasffdac</div>
+            </template>
+            
+            <!-- 
+                模版存放方法二,一般推荐方法一
+                <script id="hd" type="x-template">
+                    <div>
+                            <h3>hello</h3>
+                            <div>world</div>
+                        </div>                
+            </script>             -->
+
+            <script>
+                //定义组件的第一种方式
+                // let Header={//定义一个组件，所有的组件都可以自定义名字，每个组件的首字母度大写，放在组件内部的东西叫做选项，根实例也叫根组件，能出现在根组件里面的选项基本上都可以放在子组件里面，子组件里面的选项也可以放在根组件里面
+                //     name:'bulala',
+                //     template:'<div>我是头部组件</div>'  //这就是组件变量，Header就是组件变量名，template组件代表当前组件所使用的模版   
+                // }
+                //定义组件的第二种方式
+                let Header= Vue.extend({
+                        name:'bulala',
+                        template:'<div>我是头部组件</div>'//注意：组件必须要有一个根级元素包裹才能使用
+                    })
+                let hd={//
+                    template:'#hd',
+                    data:function(){
+                    //组件里面的数据必须是一个函数，这个函数返回一个对象，而数据就是在这个返回的对象里面,真正渲染页面的是根实例，因为根实例才找到了页面数据的注入点，而组件的职责就是把自己的模版和数据整合到一起，然后返回给根实例，由根实例来调用这些组件渲染页面。
+                    //也就是说当我们调用某一个组件的时候，这个组件的data函数就会被调用，然后会返回来数据，这些数据才能在当前的组件里面找到对应的数据名进行文本解析，解析完之后会
+                    // 拿着解析后的数据返回给我们的根组件，再由根组件来渲染页面，其他的下层组件只有把数据交给根组件就可以了
+                        return {
+                             msg2:'组件的数据',
+                             list:['a','b','c','d']
+                        }
+                    }
+                   
+                }
+                let wrap={
+                    template:'#wrap',
+                    methods:{
+                        show(){
+                            alert('ok')
+                        }
+                    }
+                }
+                let ft={
+                    template:'#ft'
+                }
+                // 注册组件只有一种方式，组件的注册，可以注册全局的也可以注册局部的，全局的可以拆分出去其他实例都可以使用，局部的只有当前实例可以使用
+                // Vue.component('v-header',Header)//注册全局的
+                let vm=new Vue({
+                    el:'#app',
+                    components: {//注册局部的
+                       'v-header':Header,
+                       hd,wrap,ft
+                    },
+                    data:{
+                        msg:'根实例的数据'
+                    }
+                })
+            </script>
+</body>
+</html>

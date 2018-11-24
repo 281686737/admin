@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <!-- 组件中谁要用谁就由谁来注册谁 -->
+
+    <div id="app">
+        <aa></aa>
+        <cc></cc>
+    </div>
+
+    <template id="aa">
+            <div>
+                <h3>aa组件</h3>
+                <bb></bb>
+                <cc></cc>
+            </div>
+        </template>
+    <template id="bb">
+        <div>
+            <h3>bb组件</h3>
+            <cc></cc>
+        </div>
+    </template> 
+    <template id="cc">
+            <div>
+                <h3>cc组件</h3>
+            </div>
+        </template>         
+    <script>
+          let cc={
+            template:'#cc'
+        }
+        Vue.component('cc',cc)//把cc注册成公共组件，这样aa,bb都可以使用
+        //  let bb={
+        //     template:'#bb'
+        // }
+        // let aa={
+        //     template:'#aa',
+        //     components:{
+        //         bb
+        //     }
+        // }
+       
+        new Vue({
+            el:'#app',
+            components:{
+                aa:{//也可以写成这样的格式
+                    template:'#aa',
+                    components:{
+                        bb:{
+                            template:'#bb'
+                        }
+                    }
+                }
+            }
+        }) 
+    </script>
+</body>
+</html>

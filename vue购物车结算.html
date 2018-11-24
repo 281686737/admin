@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../vue.js"></script>
+    <script src="../vue-resource.js"></script>
+</head>
+<body>
+    <div id="buycar">
+        <dl v-for='(item,index) of list' :key="item.id">
+            <dt>商品名称：{{item.name}}</dt>
+            <dd>单价：{{item.price | currency('￥',2)}}</dd>
+            <dd>数量：<input type="number" min="0" v-model="item.count" ></dd>
+            <dd>小计：{{item.price*item.count | currency }}</dd>
+        </dl>
+        总计：{{cptSum | currency('￥',2)}}
+        <input type="button" value="读取数据stati" @click="getStatic()">
+        
+    </div>
+    <script>
+        // Vue.filter('fixed',(data,num=2)=>{
+        //     console.log(this);//vue全局里面的this指向window
+        //     return data.toFixed(num)
+        // })
+        let vm= new Vue({
+            el:'#buycar',
+            data:{
+                list:[
+                    {id:1,name:'西红柿',price:3.5,count:3},
+                    {id:2,name:'鸡蛋',price:1,count:3},
+                    {id:3,name:'黄瓜',price:.8,count:5}
+                ]
+            },
+            filters: {
+                fixed:(data,num)=>{
+                    console.log(this);
+                    return data.toFixed(num)
+                },
+                currency(data,currency="$",digit="2"){
+                    return currency + data.toFixed(digit)
+                }
+            },
+            computed:{
+                cptSum(){
+                    var result=0;
+                    this.list.forEach((item,index)=>{
+                        result+=item.price*item.count
+                    })
+                    return result
+                }
+            }
+            ,methods: {
+                getStatic(){
+                this.$http({
+                    url:'/Vuetest/data/goods.json'
+                }).then(
+                    (res)=>{
+                        console.log(res);
+                        },
+                    (err)=>{
+                        console.log(err);
+                    }
+                )
+                }
+            }
+        })
+        // vm.$mount('#buycar');//利用实例方法挂载模版中的数据
+    </script>
+    
+<!--
+     过滤器(filter)： 就是个函数
+            场景： 格式数据
+            currency / number / date  / money vue1.x
+            vue2.x 取消了自带过滤器,  需要用户自行封装
+            使用：	{{数据名 | 过滤器名(参数1,参数2)}}
+                    v-xxx="数据名 | 过滤器名(参数1,参数2)"
+                    :属性="数据| ... "
+            定义:
+                    a) Vue.filter('过滤器名称',函数(要过滤的元数据,参数))
+                    b) 选项
+                        filters:{
+                            过滤器名称:函数
+                            过滤器名称2:函数(要过滤的元数据,参数)
+                        } 
+    数据交互：
+            XMLHttpRequest|ActiveObject
+                - ajax函数
+            $.ajax({
+
+            })
+            fetch()  返回 是一个promise
+            promise
+
+            vue-resource   下载安装引入   vue1.x 推荐	支持jsonp
+
+                使用:	返回的是promise对象
+                this.$http.get('url地址?key=value&key=value').then(succFN,errorFn)
+                this.$http.get('url地址',{配置}).then(succFN,errorFn)
+                this.$http.post('url地址',{数据},{配置}).then(succFN,errorFn)
+                this.$http.jsonp('url地址',{配置}).then(succFN,errorFn)
+
+                    配置:
+                        params: {key:value}  携带数据  get
+                        headers: {}  携带请求头
+                        method：'get' get/post/.....   string
+                        timeout: number  超时
+                        progress：fn   进度
+                        credentials: false  是否携带跨源凭证
+                        emulateJSON：true post请求是需要携带的请求头
+                        jsonp:'回调函数键' 默认是callback
+                        jsonpCallback: '回调函数名'
+                    响应：
+                        body      返回的数据  对象  (JSONP.parse)
+                        bodyText  返回的数据  文本格式  toString-->
+</body>
+</html>

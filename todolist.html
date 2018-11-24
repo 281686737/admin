@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- {{num+9}}, {{obj.a}},{{bl ? '男' : '女'}}，{{str.split(' ').reverse().join(' ')}},函数这些都是模版表达式，但是类似if的判断语句是不可以的。
+            模版表达式可以省略this，但是vm实例里面是不能省略的.模版其实是类里面的一个成员，所以模版里的this和vm实例里面的this指向的是相同的作用域 -->
+        {{this.num+9}}----结果是：119<br>
+        {{obj.a}}----结果是：1<br>
+        {{bl ? '男' : '女'}}----结果是：男<br>
+        {{str.split(' ').reverse().join(' ')}}----结果是：you love i<br>
+        {{fn()}}<br>
+        {{fn2()}}<br>
+        {{iptstr}}<br>
+
+
+        <input type="text" id="ipt1" v-model="iptName" :style="'color:red'"><br>
+        <input type="text" id="ipt2" v-model="iptContent" :style="'color:red'"><br>
+        <input type="button" value="提交" @click="add" :style="'color:red'"><br>
+        <input type="text" v-model="search" :style="'color:red'"><br>
+           
+        <ul>
+            <li v-for="(item,index) in cptArr" :key="index">
+                <span>{{item.name}}</span>:<i>{{item.content}}</i>
+                <a href="javascript:" @click="del(index)">删除</a>
+                <a href="javascript:" @click="check(index)">修改</a>
+                <!-- <a href="javascript:" @click="this.bl=!this.bl">修改</a> -->
+
+                <div v-show="item.bl">
+               <input type="text"  id="ipt" v-model="shower">
+               <input type="button" value="确定" @click="confirm(index)">
+
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        let vm=new Vue({
+            el:"#app",
+            data:{ 
+                num:110, 
+                bl:true, 
+                obj:{a:1,b:2}, 
+                str:'i love you', 
+                fn:function(){return 'bmw'},       
+                fn2:function(){return this.str.split(' ').reverse().join(' ')},
+                arr:[
+                    {name:'alex',content:'还钱',bl:false},
+                    {name:'bulala',content:'不在',bl:false},
+                    {name:'apple',content:'不在',bl:false},
+                    {name:'banana',content:'不在',bl:false},
+                    {name:'pear',content:'不在',bl:false}
+
+                ],
+                iptName:'alex',
+                iptContent:'好吧',
+                shower:'',
+                search:''
+            },
+            methods:{
+                add:function(){
+                    this.arr.push({
+                        //增加.里面的this指向的是当前的vm实例，而vm实例上又有实例属性和实例方法让我们使用，具体的写法是：
+                        //vm.$(实例方法()|$实例属性)==this.$(实例方法()|$实例属性)
+                        name:this.iptName,
+                        content:this.iptContent
+                    })
+                },
+                del(index,eve){//是es6函数的写法，等于del:function(){}
+                    this.arr.splice(index,1)//删除点击的那条数据
+                },
+// 数据检测：vue的数据是响应式，非响应式的情况如下
+// 	数组数据变化：  数组的变异方法包括：push(),pop(),shift(),unshift(),splice(),sort(),reverse()
+// 			问题:对数组使用了非变异 (non-mutating method) 方法例如：filter(),concat(),slice()（返回的了新数组）
+// 			解决： 对象合并
+
+// 			问题：利用索引直接设置一个项|修改数组的长度时
+// 			解决：Vue.set(数组对象, key, value) | vm|this.$set(数组对象, key, value)
+// 	对象的数据变化：对象里面新增一个键，不会导致数据更新；对数组里面的索引直接进行赋值操作，不会导致数据进行更新
+// 			问题：data:{a:1}
+// 					a 数据是响应式的
+// 					vm.b='qq';  b 属性不是响应式的
+// 			解决：Vue.set(数组对象, key, value) | vm|this.$set(数组对象, key, value)
+
+// 条件渲染
+                check(index,eve){//修改
+                    // Vue.set(this.arr[index],'content','bmw')//几乎所有的类方法都有与之对应的实例方法
+                    // this.$set(this.arr[index],'content','qq')
+                    this.arr.forEach(function(item,index ){
+                        item.bl=false
+                    });
+                    this.$set(this.arr[index],'bl','true')
+                    this.shower=this.arr[index].content
+                },
+                confirm(index){
+                    this.$set(this.arr[index],'bl',false)
+                    Vue.set(this.arr[index],'content',this.shower)//几乎所有的类方法都有与之对应的实例方法
+                    this.shower=''
+                }
+            },
+// 模块表达式:
+
+//     {{数据本身|data的属性|变量|表达式}}
+//     v-指令名="数据|data的属性|变量|表达式"
+//      {{num+9}}, {{obj.a}},{{bl ? '男' : '女'}}，{{str.split(' ').reverse().join(' ')}},函数这些都是模版表达式，但是类似if的判断语句是不可以的。
+//      模版表达式可以省略this，但是vm实例里面是不能省略的.模版其实是类里面的一个成员，所以模版里的this和vm实例里面的this指向的是相同的作用域 
+
+// 计算属性computed:  是一个函数,是把原属性拿着重新计算一遍，未来所依赖的原数据发生变化时，就会再次重新执行.计算属性是响应式的
+//     computed:{
+//         计算属性:函数:function(){return 返回值}		使用:	{{计算属性}}
+//     }
+
+//     与method的区别:	方法会每次调用，计算属性不会(只有在与之相关的原数据发生变化时，才调用)
+//         计算属性的性能高: 适合做筛选也就是查
+//         方法：适合在列表渲染使用，强制渲染执行
+
+            computed:{
+                iptstr:function(){
+                    return this.str.split(' ').reverse().join(' ')
+                },
+                cptArr(){
+                    let result=[];
+                     this.arr.forEach(function(item,index){
+                         if(item.name.indexOf(this.search)!=-1){
+                             result.push(item)
+                         }
+                     }.bind(this))
+                     return result;
+                }
+            }
+        })
+
+
+    </script>
+</body>
+</html>

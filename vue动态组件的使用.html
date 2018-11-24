@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <!-- 动态组件:
+	动态组件： 组件动态化(数据化)就是根据数据来决定加载哪个组件
+	<component is="'组件名'"></component>//组件名是一个字符
+	<component :is="数据"></component>//把字符组件放在数据里面就是一个变量名，前面要用事件进行绑定
+
+    内容分发   封装（公共业务）组件  props   ref  slot
+        组件内部:	slot 组件槽位  <slot 属性：name=槽名
+        <组件名><标签 slot="槽名">内容</..</...
+         -->
+         <div id="app">
+             <!-- 动态组件 -->
+            <!-- <component is="aa"></component>
+            <component :is="'aa'"></component>
+            <component :is="com"></component> -->
+
+            <!-- 内容分发:如果内容分发的数据发生了改变，那么使用者也会随之改变。注意使用的时候槽位要一一对应，如果没有一一对应，会出现默认分发的情况 -->
+            {{msg1}}
+            <aa>
+                <h3 slot="ban">{{msg1}}</h3>
+                <a href="#" slot="ft">内容</a>
+                <span>新的槽位</span>
+            </aa>
+                
+         </div>
+         <template id="aa">
+            <div class="aa">
+                <slot name="ban"></slot>
+                <ul>
+                    <li>xxxx</li>
+                    <li><slot></slot></li>
+                    <li>xxxx</li>
+                    <li>xxxx</li>
+                </ul>
+                <slot name="ft"></slot>
+
+            </div>
+         </template>
+         <template id="bb">
+            <div class="bb">
+                <h3>bb组件</h3>
+            </div>
+         </template>
+         <script>
+             let aa={
+                 template:'#aa',
+                 data(){
+                     return {
+                         msg:'aa数据'
+                     }
+                 }
+             }
+             let bb={
+                 template:'#bb',
+                 data(){
+                     return {
+                         msg:'bb数据'
+                     }
+                 }
+             }
+             let vm = new Vue({
+                 el:'#app',
+                 data:{
+                     com:'aa' ,//把字符组件放在数据里面就是一个变量名，前面要用事件进行绑定
+                     msg1:'父数据'
+                 },
+                 components: {
+                     aa,bb
+                    //  'aa':aa,组件名是一个字符
+                 }
+             })
+         
+         
+         </script>
+</body>
+</html>

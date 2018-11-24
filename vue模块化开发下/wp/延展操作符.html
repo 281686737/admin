@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        //** 延展操作符在新的框架脚手架里面已经支持，但是在低版本的框架里面会不支持，所以需要找对应的babel插件babel-plugin-transform-obj-rest配合使用
+        var arr=[1,2,3]
+        var arr1=[...arr]   //    eval()可以把字符串里面的内容拿出来
+        arr1.push(4)
+        console.log(arr);//延展操作符只是对原来的数组延展了一份，并不影响原数组；如果延展操作符放在对象的前面，相当于把对象之间拿出来
+        function aa(a,b,...rest){}//延展操作符放在函数里需要配合rest使用，是把没有接收到的剩余参数延展了一份出来
+        aa(1,2,3,4,5)
+        var obj={a:1,b:2}
+        var obj1={...obj,c:3}
+        console.log(obj1);
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

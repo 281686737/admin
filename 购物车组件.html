@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+    <style>
+        .buycar{width:600px;background: #777777;color: white}
+    </style>
+
+    <template id="buycar">
+        <div class="buycar">
+                <dl v-for='(item,index) of list' :key="item.id">
+                    <dt>商品名称：{{item.name}}</dt>
+                    <dd>单价：{{item.price | currency('￥',2)}}</dd>
+                    <dd>数量：<input type="number" min="0" v-model="item.count" ></dd>
+                    <dd>小计：{{item.price*item.count | currency }}</dd>
+                </dl>
+                总计：{{cptSum | currency('￥',2)}}    
+         </div>
+    </template>
+
+<body>
+    <div id="app">
+        <hd></hd>
+        <buycar></buycar>
+        <ft></ft>
+    </div>
+    
+    <script>
+        let hd={template:'<div>头</div>'}
+        let buycar= {
+            template:'#buycar',
+            data(){
+                return{
+                 list:[
+                    {id:1,name:'西红柿',price:3.5,count:3},
+                    {id:2,name:'鸡蛋',price:1,count:3},
+                    {id:3,name:'黄瓜',price:.8,count:5}
+                ]
+            }
+        },
+            filters: {
+                fixed:(data,num)=>{
+                    console.log(this);
+                    return data.toFixed(num)
+                },
+                currency(data,currency="$",digit="2"){
+                    return currency + data.toFixed(digit)
+                }
+            },
+            computed:{
+                cptSum(){
+                    var result=0;
+                    this.list.forEach((item,index)=>{
+                        result+=item.price*item.count
+                    })
+                    return result
+                }
+            }                  
+        }
+        let ft={template:'<div>尾</div>'}
+        new Vue({
+            el:'#app',
+            components:{
+                hd,buycar,ft
+            }
+        })
+    </script>
+
+</body>
+</html>

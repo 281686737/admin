@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 脚手架: vue-cli  搭建vue项目环境,帮我们运行在项目环境下
+		但凡是vue环境下使用一个插件，并且插件通过npm下载到第三方包里以后，还需要安装到vue的头上
+        安装 npm instal vue-cli -g 帮我们搭建Vue环境         vue --version查看vue-cli版本
+        安装好之后vue命令行简写是vue
+        init:初始化，帮我们把webpack配置好，帮我们把package-json做好也可以帮我们搭建一个vue的helloworld（需要借助从vue的官网上拷贝一些vue模版下来） generate a new project from a template
+		list：可以查看目前vue提供了哪些模版         list available official templates
+		pwa:多页面模版；browserify是兼顾为了vue1.x版本；webpack（专业级模版，工作中常用）和webpack-simple（简洁型模版）模版是急于webpack开发的vue模版
+        build          prototype a new project
+        create         (for v3 warning only)
+        help [cmd]     display help for [cmd]
+        创建项目环境: 如果想在当前文件创建Vue init webpack .就可以了
+        vue init webpack-simple wp-simple(webpack-simple意思是模版来自于哪个目录,wp-simple是举例子的)    webpack-simple|webpack  模板
+        cd 目录
+        npm install
+        npm run dev  运行
+        开发....
+        npm run build 打包
+		默认端口是8080，虚拟目录指向了dist
+		安装好模版模版之后会出现一些新的文件：
+		README.md是创建项目的说明文件，也就是将来上传到GitHub上的说明文件；
+		.gitignore是上传之后的一些操作；.editorconfig是脚手架，对编辑器进行高亮支持或者代码提示等功能;
+		在package.json里有两个脚本：1.cross-env NODE_ENV=development是一个模块变量是npm的一个包，用来设置环境变量作用是如果下次安装时端口冲突的话，
+		它会帮我们自动递增端口，npm run dev 跑的是webpack-dev-server --open，后面的--hot意思是说支持热重载；npm run build相当于webpack -p意思就是在压缩的时候可以显示进度。
+		dependencies是项目依赖，vue-loader以及vue-template-compiler是帮我们把vue的模块拆分出来之后，让浏览器支持拆分出来的组件。
+		.babelrc是babel的配置文件
+----------------------------------------------------------------------
+		如果需要引入路由，那么需要在项目中安装vue-router这个插件（npm安装当前环境：npm i vue-router -D）,安装好之后要在主入口文件main.js引入vue-router插件或者在router.config.js
+		使用Vue.use(VueRouter)方法将插件安装到Vue头上
+		路由守卫:
+		如果是全局守卫，也就是说给整个路由对象router做守卫的，适用于整个web页面只针对vip或者登陆用户可见时使用，写法是router.beforeEach注册一个全局前置守卫，进入前守卫：
+		beforeEach是个函数，接收一个回调，回调里面接收一个to，一个from.to代表去向的目标路由，from代表当前所在的路由，next是一个通过函数就是说要不要让他通过也可以认为是管道函数，
+		如果是false就中断跳转，如果是地址就跳转到解决方法的路由;router.afterEach注册一个全局后置守卫，离开前守卫，也是个函数，接收一个回调，回调接收两个参数，to,和from同上。
+		路由的三个概念：整个路由对象router、routes(routes是整个路由的配置)以及当前的单个路由route都会被守卫；
+		如果是路由独享守卫，是说在配置路由routes时有多条路由，当进入其中某个路由或者离开这个路由的时候会被守卫；
+		如果是组件内守卫，是说我们可以把守卫的工作写在组件的内部，可能有很多路由的配置最终通过conponets都指向了某一个组件，在这个组件的内部做一个守卫，就是说相关的一些守卫工作是写
+		在这个组件内部来完成守卫，通过一些相关的路由钩子beforeRouterEnter进入之前,beforeRouterUpdate更新时候,beforeRouterLeave离开之前写在组件内部
+		beforeRouteEnter(to,from,next){}	前置守卫,进入
+			to 目标路由
+			from 当前路由
+			next 是个函数  next() == next(true)  运行跳转
+						   next(false) 不让跳转  
+		beforeRouteLeave(to,from,next){}  后置守卫,离开
+	之前通过resource和axious读到的数据都是进入到组件里加载的数据
+	路由数据预载:就是没有进入到某个组件之前就加载数据，在路由守卫的时候给你实现，因为守卫时还没有进入到组件，我们可以通过路由守卫的钩子函数把数据先求取到然后再跳转到目标路由组件中去。
+	因为要在进入目标组件之前拿到数据，所以要在前置守卫里面做数据预载
+		beforeRouteEnter(to,from,next){//to代表的是目标路由，它是一个对象，我们可以事先在目标路由身上绑定一些属性query，通过钩子函数利用axious拿到一些数据，把这些数据绑定到目标路
+			由头上就可以了：到了目标路由之后，目标路由的data身上有一个$route的选项,那就是一条路由，也就是to的位置，from是当前路由，一般情况下，在beforeRouterEnter这个钩子函数里面，
+			当前路由会给目标路由传递一些参数，路由守卫先把这些参数事先拿到然后拿到之后再绑定到目标路由的data属性上面，然后再选择next这个参数，目标路由就可以直接通过axious找当前路由
+			拿数据，完成数据预载,这是第一种方案。
+			1. 兜库 this.$http   axios可用
+			2. next( _this => _this.属性="拿到的数据")
+		}
+		
+-----------------------------------------------------------------------------
+Vue.use( plugin )
+参数：
+
+{Object | Function} plugin
+用法：
+
+安装 Vue.js 插件。如果插件是一个对象，必须提供 install 方法。如果插件是一个函数，它会直接调用这个函数，把Vue作为一个参数直接传递到 install 方法中去。install 方法调用时，
+会拿到这个Vue ，就使用拿到的这个Vue然后在全局定义一个组件，这样就可以在全局任何一个位置使用这个组件。
+
+当 install 方法被同一个插件多次调用，插件将只会被安装一次。
+----------------------------------------------------------------------
+状态管理  store
+		什么时候用： 打算开发中大型应用
+		集中式数据管理就是在全局应用的最顶层找一个全局的对象,把数据放在这个对象里面存储以及读取， 一处修改，多处使用，可以做到数据同步，但是它是临时的刷一下就没了
+
+		思维流程:
+											store.js
+					this.$store.commit(type,payload)	-> mutations
+					this.$store.dispatch(type,payload)		-> actions			
+				     mapActions() ->actions								mapGetters()->getters
+				学生		代课老师		校长		 财务      版主任		学生
+			components - >  actions		->  mutations -> state  <- getters	<-	components
+				发送请求      处理			修改状态	 	状态
+				拿数据		  业务逻辑		修改state			   读取state
+							  异步
+														  state<-$store.state <-  学生
+				注意：调试工具中state发生改变是因为mutations直接影响发生改变；
+						getters发生改变是因为组件conponent发生改变才改变的
+	-----------------------------------------------------------------------------
+	安装 vuex 状态管理插件
+	引入 + use
+	当我们引入vuex的时候会在全局打造一个对象store，任何一个组件都可以通过this.$store这个全局的实例的属性来拿到全局的这个大对象，它身上有一些api可以用来提供组件conponents与角色和
+	角色之间的通讯比如说conponents与actions直接可以通过dispatch来进行通讯；而actions与mutations之间可以通过commit来实现通讯；但是如果conponents与mutations直接有什么关系的话，
+	可以通过commit来直接通讯，但是这样并不好，因为这样没有处理业务逻辑。mutations可以拿到state本身，可以修改它自身的状态，所以直接拿来用就好了。另外不只是conponents可以通过
+	dispatch与actions进行通讯，其他的角色也都可以通过dispatch来与actions进行通讯。另外conponents也可以通过mapActions（）与actions进行通讯：mapActions（）相当于对dispatch进行
+	一个集中式的管理，按照队列处理完一个通讯再接着处理下一个通讯。所以作为conponents组件可以通过dispatch和mapActions与actions进行通讯，actions与muations之间只能通过commit进行通
+	讯，conponents也可以通过commit与mutations进行通讯。conponents与getters之间通过mapGetters()这个函数进行通讯，而作为一个特殊化的conponents组件也可以直接通过全局对象store
+	身上的state属性与state进行通讯，这些都是不标准的方式建立的通讯
+	------------------------------------------------------------------------------
+	mapActions/mapGetters  执行后， 返回来的是对象
+		对象:	{incremen:fn,decrement:fn,xx,xx}
+	------------------------------------------------------------------------------
+	this.$store.commit('increment',参数/负载/payload) -> mutations	//第一个参数是数据的类型，第二个是携带的数据，dispatch也一样
+	this.$store.dispatch('increment',参数/负载/payload)  -> actions //dispatch可以写携带请求的类型和携带的负载也就是携带的数据，也可以直接跳过actions直接找mutations
+						  decrement
+	const actions = {
+		increment:({store对象,commit函数},参数)=>{}
+	}
+	<xx @click="请求类型(负载)"   actions: 请求类型:({},payload)=>{payload==负载}
+	......
+	注意：axios不能通过全局安装使用，只能谁用谁安装这样来使用
+----------------------------------------------------------------------------	
+
+数据传递，数据流动，流向控制  
+		0)   父->子 props属性       子->父  事件
+		a)   A -> A父  ->  子B    A B 要有共同父   父==中间人默认
+		b)   订阅发布模式  下载pubsub 库   创建空的Vue实例 实例.$emit 发布|$on 订阅
+		c) 	web存储(cookie,localstroge/seession)
+		d) 	存库
+		e)  状态管理
+		f)  非状态管理  把数据存到Vue的根组件上(data) 其他组件$root.$data 访问及修改
+		永久: 存库 , localstroge,cookie
+		临时：状态管理,订阅发布模式 -->
+		<hr>
+
+</body>
+</html>

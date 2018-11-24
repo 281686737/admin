@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div @contextmenu="show2">
+            
+            <input type="button" value="按钮" @click.stop="show" ><!-- vue提供的取消事件冒泡的方法：@click.stop,后面跟上要取消的事件名，它也叫做事件修饰符 -->
+            <input type="button" value="按钮" @contextmenu.stop.prevent="show2" ><!-- vue提供的阻止右键默认行为的方法： @contextmenu.prevent,后面跟上要取消右键默认行为的事件名，它也叫做事件修饰符；事件修饰符可以连缀 -->
+            <!-- <input type="text" @keydown.13='show' v-model='ipt'><br> -->
+            <hr>
+            <textarea name="" id="" cols="30" rows="10" @keydown.enter.ctrl.exact='show' v-model='ipt2'></textarea><!-- vue提供的严格匹配Ctrl+enter发送消息，exact是严格匹配的意思 -->
+            <ul>
+                <li v-for='item in list'>{{item}}</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        let vm=new Vue({
+            el:'#app',
+            data:{
+                ipt:'',
+                ipt2:'',
+                list:['qq','bmw']
+            },
+            methods: {
+                show(ev){
+                    this.$emit('bulala','qq')//触发自定义事件绑定
+                    this.$off('bulala')//取消事件绑定或者订阅
+                    // ev.cancelBubble=true;//取消事件冒泡
+                    // ev.stopPropagation();//取消事件冒泡
+                    console.log(ev.keyCode);
+                    // if(ev.keyCode===13){
+                        // this.list.push(this.ipt)
+                        this.list.push(this.ipt2)
+                        this.ipt=''
+                    // }
+                },
+                show2(ev){
+                    console.log('div')
+                    // ev.preventDefault();//阻止右键默认行为
+                    
+                }
+            }
+        })
+        vm.$on('bulala',(data)=>{console.log(data);})
+    </script>
+    <!-- 
+        vue事件：
+            模块绑定行间事件:		<xx v-on:事件名="方法名($event,参数)"
+                                    <xx @事件名="方法名($event,参数)"		
+            绑定自定事件:
+                定义：vm.$on( '自定义事件名'|['自定义事件名1','自定义事件名2'], 回调(参数) )
+                销毁：vm.$off( '自定义事件名'|['自定义事件名1','自定义事件名2'], 回调(参数) )
+                触发: vm.$emit(自定义事件名1,参数)
+                show(ev){
+                    this.$emit('bulala','qq')//触发自定义事件绑定
+                    this.$off('bulala')//取消事件绑定或者订阅
+                }
+            事件对象:
+                事件对象可以不传递，需要传递的场景:传参数同时使用事件对象时
+                show($event,参数)
+
+            冒泡：默认冒泡
+                $event   ev|event.cacelBubble=true ev.stopPropagation()
+                @click.stop 修饰符
+                <input type="button" value="按钮" @click.stop="show" > 
+                vue提供的取消事件冒泡的方法：@click.stop,后面跟上要取消的事件名，它也叫做事件修饰符 
+
+            默认行为:
+                event|ev.preventDefault();   @事件.prevent
+                <input type="button" value="按钮" @contextmenu.stop.prevent="show2" > 
+                vue提供的阻止右键默认行为的方法： @contextmenu.prevent,后面跟上要取消右键默认行为的事件名，它也叫做事件修饰符；事件修饰符可以连缀 
+
+            连缀:	@事件.修饰符.修饰符	@事件.prevent.stop
+                <textarea name="" id="" cols="30" rows="10" @keydown.enter.ctrl.exact='show' v-model='ipt2'>
+                </textarea> vue提供的严格匹配Ctrl+enter发送消息，exact是严格匹配的意思 
+
+         -->
+</body>
+</html>

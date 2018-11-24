@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+        <!-- 组件数据流动/数据传递/通讯:        
+            父->子  属性(props)	√   松偶合	原理：props是vue里面的的一个选项，当在一个组件里面，调用或者使用另外一个组件的时候，我们要把组件的数据
+            以props的形式传给你调用的那个组件，这个属性不是HTML属性，也不是DOM属性，因为这个props属性是写给子组件本身的，是我们自定义的一个属性，
+            然后我们以绑定的形式，绑定到当前作用域下的父数据，子组件只要拿到这个自定义的属性就可以了，自定义属性在子组件内部是通过props选项来获取的
+
+            <子 :自定义属性="父数据"></..>vue里面props可以强行修改父数据，但是无法影响到父数据，只能影响到自己：也就是说父数据的内容是拷贝了一份给子，并不是指针指
+            向了子。一旦上层父数据发生改变，那么就会影响所有下层接收的props发生改变，建议推荐数据传递从顶层组件往下传递，这是三大框架推崇的思想
+            子组件:
+                选项
+                props:['自定义属性']   props:{自定义属性:{type/default/required/...}}
+            展示:	子模板	{{自定义属性}}
+        子->父  事件(自定义)  √原理：也是通过父子之间通过模版内调用子的时候来传递的：先给子自定义一个事件，然后在一个恰当的事件触发这个事件，一旦触发调用的是
+        父的方法，父的方法被调用了，说明他们之间由下向上打通了，这个时候子可以通过$emit来触发这个自定义事件，也可以携带当前子环境下的数据，调用父的方法，父的
+        methods方法就可以接收数据，接收到了就说明数据已经传到父里面了
+            <子 @自定义事件="父方法"></..>
+            子:		this.$emit('自定义事件',子.数据名) 
+            父:		methods-> 父方法(接受数据){处理}
+    
+        同级<->同级: 子->父->子  √通过父组件作为中间人来传递：
+    ref: 场景:	封装（公共业务）组件  props   ref  slot
+    
+        父子之间共享数据和方法  
+            <子 ref="自定义子名称"></..>
+            父访问子:	this.$refs.自定义子名称.数据名/方法()
+            子访问父:	this.$parent.数据名/方法()
+    
+    bus: 订阅发布对象( 空的Vue实例 )
+        new Vue()=bus  bus.$emit()/$on()
+        bus.$emit('自定义的事件名',数据)
+        bus.$on('自定义的事件名',function(接){处理})
+    
+    -----------其他-------------------
+            b)   订阅发布模式（pubsub） 
+            c) 	web存储(cookie,localstroge)
+            d) 	存库
+            e)  状态管理 -->
+    <div id="app">
+        <h3>父组件</h3>
+        <child :bulala='msg1' :msg3='msg3'></child>
+    </div>
+     <template id="child">
+         <div class="child">
+            <h3>子组件</h3>
+            <div>{{bulala}}</div>
+            <div>{{msg3}}</div>
+         </div>
+     </template>
+    <script>
+        // 父到子的传递
+        let child={
+            template:'#child',
+            data(){
+                return {
+                    msg2:'子数据'
+                }
+            },
+            props:['bulala','msg3'],
+            mounted() {
+                // console.log(this.bulala,this.labula);
+                // this.bulala='修改了父数据' //props里面的数据可以修改，但是vue会报错
+            },
+        }
+        let vm=new Vue({
+            name:'parent',
+            el:'#app',
+            data:{
+                msg1:'父数据1',
+                msg3:'父数据3'
+            },
+            components:{
+                child
+            }
+        })
+    </script>
+</body>
+</html>
